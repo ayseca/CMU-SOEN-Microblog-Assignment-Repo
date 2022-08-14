@@ -18,13 +18,13 @@ def login():
     if form.validate_on_submit():
         print(str(form.username))
         print(str(form.username.name))
-        print("found username: " + form.username.data)
-
+        print("found usernmae: " + form.username.data)
+    
         user = User.query.filter_by(username=form.username.data).first()
         print("user: " + str(user))
         if user is None:
             user = User.query.filter_by(email=form.username.data).first()
-
+            
         if user is None or not user.check_password(form.password.data):
             flash(_('Invalid username or password'))
             return redirect(url_for('auth.login'))

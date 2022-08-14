@@ -13,10 +13,6 @@ import rq
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
 
-import logging
-logging.basicConfig(filename='std.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 
 class SearchableMixin(object):
     @classmethod
@@ -154,7 +150,8 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
-            current_app.config['SECRET_KEY'], algorithm='HS256')
+            current_app.config['SECRET_KEY'],
+            algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -166,9 +163,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
         return User.query.get(id)
 
     def new_messages(self):
-        last_read_time = self.last_message_read_time or datetime.now() + timedelta(days=4)
-        logger.info("Last read time: " + str(last_read_time))
-        logger.info([t.timestamp for t in Message.query.filter_by(recipient=self).all()])
+        last_read_time = self.last_message_read_time or datetime(1900, 1, 1)
         return Message.query.filter_by(recipient=self).filter(
             Message.timestamp > last_read_time).count()
 

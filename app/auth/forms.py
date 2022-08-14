@@ -1,11 +1,9 @@
-import logging
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from flask_babel import _, lazy_gettext as _l
 from app.models import User
 
-logger = logging.getLogger()
 
 class LoginForm(FlaskForm):
     username = StringField(_l('Username or E-mail address'), validators=[DataRequired()])
@@ -21,7 +19,6 @@ class RegistrationForm(FlaskForm):
     password2 = PasswordField(
         _l('Repeat Password'), validators=[DataRequired(),
                                            EqualTo('password')])
-
     submit = SubmitField(_l('Register'))
 
     def validate_username(self, username):

@@ -1,4 +1,3 @@
-
 from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
@@ -10,10 +9,6 @@ from app.auth.forms import LoginForm, RegistrationForm, \
 from app.models import User
 from app.auth.email import send_password_reset_email
 
-import logging
-logging.basicConfig(filename='std.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -21,10 +16,19 @@ def login():
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
+        print(str(form.username))
+        print(str(form.username.name))
+        print("found usernmae: " + form.username.data)
+
         user = User.query.filter_by(username=form.username.data).first()
+        print("user: " + str(user))
+        if user is None:
+            user = User.query.filter_by(email=form.username.data).first()
+
         if user is None or not user.check_password(form.password.data):
             flash(_('Invalid username or password'))
             return redirect(url_for('auth.login'))
+
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
@@ -46,8 +50,6 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
-        if form.password.data.isalpha():
-            logger.info("Password does not contain numbers")
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()

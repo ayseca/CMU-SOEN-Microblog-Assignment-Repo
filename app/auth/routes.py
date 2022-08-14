@@ -18,7 +18,7 @@ def login():
     if form.validate_on_submit():
         print(str(form.username))
         print(str(form.username.name))
-        print("found usernmae: " + form.username.data)
+        print("found username: " + form.username.data)
 
         user = User.query.filter_by(username=form.username.data).first()
         print("user: " + str(user))
